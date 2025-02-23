@@ -67,7 +67,7 @@ template <typename T>
 class optional
 {
    public:
-    optional<T>(T const &type) : valid(true), type(type) {}
+    explicit optional<T>(T const &type) : valid(true), type(type) {}
     optional<T>() : valid(false), type(T()) {}
     T *operator->()
     {
@@ -87,14 +87,16 @@ class optional
 struct Dimensions
 {
     Dimensions(double width, double height) : width(width), height(height) {}
-    Dimensions(double combined = 0) : width(combined), height(combined) {}
+    explicit Dimensions(double combined = 0) : width(combined), height(combined)
+    {
+    }
     double width;
     double height;
 };
 
 struct Point
 {
-    Point(double x = 0, double y = 0) : x(x), y(y) {}
+    explicit Point(double x = 0, double y = 0) : x(x), y(y) {}
     double x;
     double y;
 };
@@ -134,9 +136,9 @@ struct Layout
         BottomRight
     };
 
-    Layout(Dimensions const &dimensions = Dimensions(400, 300),
-           Origin origin = BottomLeft, double scale = 1,
-           Point const &origin_offset = Point(0, 0))
+    explicit Layout(Dimensions const &dimensions = Dimensions(400, 300),
+                    Origin origin = BottomLeft, double scale = 1,
+                    Point const &origin_offset = Point(0, 0))
         : dimensions(dimensions),
           scale(scale),
           origin(origin),
@@ -208,7 +210,8 @@ class Color : public Serializeable
     Color(int r, int g, int b) : transparent(false), red(r), green(g), blue(b)
     {
     }
-    Color(Defaults color) : transparent(false), red(0), green(0), blue(0)
+    explicit Color(Defaults color)
+        : transparent(false), red(0), green(0), blue(0)
     {
         switch (color)
         {
@@ -262,8 +265,8 @@ class Color : public Serializeable
                 break;
         }
     }
-    virtual ~Color() {}
-    std::string toString(Layout const &) const
+    virtual ~Color() override {}
+    std::string toString(Layout const &) const override
     {
         std::stringstream ss;
         if (transparent)
@@ -290,9 +293,9 @@ class Color : public Serializeable
 class Fill : public Serializeable
 {
    public:
-    Fill(Color::Defaults color) : color(color) {}
-    Fill(Color color = Color::Transparent) : color(color) {}
-    std::string toString(Layout const &layout) const
+    explicit Fill(Color::Defaults color) : color(color) {}
+    explicit Fill(Color color = Color::Transparent) : color(color) {}
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << attribute("fill", color.toString(layout));
@@ -306,11 +309,11 @@ class Fill : public Serializeable
 class Stroke : public Serializeable
 {
    public:
-    Stroke(double width = -1, Color color = Color::Transparent)
+    explicit Stroke(double width = -1, Color color = Color::Transparent)
         : width(width), color(color)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         // If stroke width is invalid.
         if (width < 0) return std::string();
@@ -329,11 +332,11 @@ class Stroke : public Serializeable
 class Font : public Serializeable
 {
    public:
-    Font(double size = 12, std::string const &family = "Verdana")
+    explicit Font(double size = 12, std::string const &family = "Verdana")
         : size(size), family(family)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << attribute("font-size", translateScale(size, layout))
@@ -353,8 +356,8 @@ class Shape : public Serializeable
         : fill(fill), stroke(stroke)
     {
     }
-    virtual ~Shape() {}
-    virtual std::string toString(Layout const &layout) const = 0;
+    virtual ~Shape() override {}
+    virtual std::string toString(Layout const &layout) const override = 0;
     virtual void offset(Point const &offset) = 0;
 
    protected:
@@ -379,7 +382,7 @@ class Circle : public Shape
         : Shape(fill, stroke), center(center), radius(diameter / 2)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("circle")
@@ -390,7 +393,7 @@ class Circle : public Shape
            << emptyElemEnd();
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         center.x += offset.x;
         center.y += offset.y;
@@ -412,7 +415,7 @@ class Elipse : public Shape
           radius_height(height / 2)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("ellipse")
@@ -424,7 +427,7 @@ class Elipse : public Shape
            << emptyElemEnd();
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         center.x += offset.x;
         center.y += offset.y;
@@ -444,7 +447,7 @@ class Rectangle : public Shape
         : Shape(fill, stroke), edge(edge), width(width), height(height)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("rect") << attribute("x", translateX(edge.x, layout))
@@ -455,7 +458,7 @@ class Rectangle : public Shape
            << emptyElemEnd();
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         edge.x += offset.x;
         edge.y += offset.y;
@@ -475,7 +478,7 @@ class Line : public Shape
         : Shape(Fill(), stroke), start_point(start_point), end_point(end_point)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("line")
@@ -486,7 +489,7 @@ class Line : public Shape
            << stroke.toString(layout) << emptyElemEnd();
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         start_point.x += offset.x;
         start_point.y += offset.y;
@@ -503,11 +506,12 @@ class Line : public Shape
 class Polygon : public Shape
 {
    public:
-    Polygon(Fill const &fill = Fill(), Stroke const &stroke = Stroke())
+    explicit Polygon(Fill const &fill = Fill(), Stroke const &stroke = Stroke())
         : Shape(fill, stroke)
     {
     }
-    Polygon(Stroke const &stroke = Stroke()) : Shape(Color::Transparent, stroke)
+    explicit Polygon(Stroke const &stroke = Stroke())
+        : Shape(Color::Transparent, stroke)
     {
     }
     Polygon &operator<<(Point const &point)
@@ -515,7 +519,7 @@ class Polygon : public Shape
         points.push_back(point);
         return *this;
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("polygon");
@@ -530,7 +534,7 @@ class Polygon : public Shape
            << emptyElemEnd();
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         for (unsigned i = 0; i < points.size(); ++i)
         {
@@ -546,16 +550,18 @@ class Polygon : public Shape
 class Polyline : public Shape
 {
    public:
-    Polyline(Fill const &fill = Fill(), Stroke const &stroke = Stroke())
+    explicit Polyline(Fill const &fill = Fill(),
+                      Stroke const &stroke = Stroke())
         : Shape(fill, stroke)
     {
     }
-    Polyline(Stroke const &stroke = Stroke())
+    explicit Polyline(Stroke const &stroke = Stroke())
         : Shape(Color::Transparent, stroke)
     {
     }
-    Polyline(std::vector<Point> const &points, Fill const &fill = Fill(),
-             Stroke const &stroke = Stroke())
+    explicit Polyline(std::vector<Point> const &points,
+                      Fill const &fill = Fill(),
+                      Stroke const &stroke = Stroke())
         : Shape(fill, stroke), points(points)
     {
     }
@@ -564,7 +570,7 @@ class Polyline : public Shape
         points.push_back(point);
         return *this;
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("polyline");
@@ -579,7 +585,7 @@ class Polyline : public Shape
            << emptyElemEnd();
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         for (unsigned i = 0; i < points.size(); ++i)
         {
@@ -599,7 +605,7 @@ class Text : public Shape
         : Shape(fill, stroke), origin(origin), content(content), font(font)
     {
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("text") << attribute("x", translateX(origin.x, layout))
@@ -608,7 +614,7 @@ class Text : public Shape
            << font.toString(layout) << ">" << content << elemEnd("text");
         return ss.str();
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         origin.x += offset.x;
         origin.y += offset.y;
@@ -624,8 +630,8 @@ class Text : public Shape
 class LineChart : public Shape
 {
    public:
-    LineChart(Dimensions margin = Dimensions(), double scale = 1,
-              Stroke const &axis_stroke = Stroke(.5, Color::Purple))
+    explicit LineChart(Dimensions margin = Dimensions(), double scale = 1,
+                       Stroke const &axis_stroke = Stroke(.5, Color::Purple))
         : axis_stroke(axis_stroke), margin(margin), scale(scale)
     {
     }
@@ -636,7 +642,7 @@ class LineChart : public Shape
         polylines.push_back(polyline);
         return *this;
     }
-    std::string toString(Layout const &layout) const
+    std::string toString(Layout const &layout) const override
     {
         if (polylines.empty()) return "";
 
@@ -646,7 +652,7 @@ class LineChart : public Shape
 
         return ret + axisString(layout);
     }
-    void offset(Point const &offset)
+    void offset(Point const &offset) override
     {
         for (unsigned i = 0; i < polylines.size(); ++i)
             polylines[i].offset(offset);
@@ -716,7 +722,8 @@ class LineChart : public Shape
 class Document
 {
    public:
-    Document(std::string const &file_name, Layout layout = Layout())
+    explicit Document(std::string const &file_name,
+                      const Layout &layout = Layout())
         : file_name(file_name), layout(layout)
     {
     }
@@ -726,7 +733,7 @@ class Document
         body_nodes_str += shape.toString(layout);
         return *this;
     }
-    std::string toString() const
+    std::string toString() const override
     {
         std::stringstream ss;
         ss << "<?xml " << attribute("version", "1.0")
@@ -750,7 +757,7 @@ class Document
         return true;
     }
 
-    std::string filename() const { return file_name; }
+    const std::string &filename() const { return file_name; }
 
    private:
     std::string file_name;
