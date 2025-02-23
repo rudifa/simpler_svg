@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -60,36 +61,10 @@ std::string elemEnd(std::string const &element_name)
 }
 std::string emptyElemEnd() { return "/>\n"; }
 
-// Quick optional return type.  This allows functions to return an invalid
-//  value if no good return is possible.  The user checks for validity
-//  before using the returned value.
-template <typename T>
-class optional
+struct Size
 {
-   public:
-    explicit optional<T>(T const &type) : valid(true), type(type) {}
-    optional<T>() : valid(false), type(T()) {}
-    T *operator->()
-    {
-        // If we try to access an invalid value, an exception is thrown.
-        if (!valid) throw std::exception();
-
-        return &type;
-    }
-    // Test for validity.
-    bool operator!() const { return !valid; }
-
-   private:
-    bool valid;
-    T type;
-};
-
-struct Dimensions
-{
-    Dimensions(double width, double height) : width(width), height(height) {}
-    explicit Dimensions(double combined = 0) : width(combined), height(combined)
-    {
-    }
+    Size(double width, double height) : width(width), height(height) {}
+    explicit Size(double combined = 0) : width(combined), height(combined) {}
     double width;
     double height;
 };
@@ -100,9 +75,9 @@ struct Point
     double x;
     double y;
 };
-optional<Point> getMinPoint(std::vector<Point> const &points)
+std::optional<Point> getMinPoint(std::vector<Point> const &points)
 {
-    if (points.empty()) return optional<Point>();
+    if (points.empty()) return std::nullopt;
 
     Point min = points[0];
     for (unsigned i = 0; i < points.size(); ++i)
@@ -110,11 +85,11 @@ optional<Point> getMinPoint(std::vector<Point> const &points)
         if (points[i].x < min.x) min.x = points[i].x;
         if (points[i].y < min.y) min.y = points[i].y;
     }
-    return optional<Point>(min);
+    return min;
 }
-optional<Point> getMaxPoint(std::vector<Point> const &points)
+std::optional<Point> getMaxPoint(std::vector<Point> const &points)
 {
-    if (points.empty()) return optional<Point>();
+    if (points.empty()) return std::nullopt;
 
     Point max = points[0];
     for (unsigned i = 0; i < points.size(); ++i)
@@ -122,54 +97,32 @@ optional<Point> getMaxPoint(std::vector<Point> const &points)
         if (points[i].x > max.x) max.x = points[i].x;
         if (points[i].y > max.y) max.y = points[i].y;
     }
-    return optional<Point>(max);
+    return max;
 }
 
 // Defines the dimensions, scale, origin, and origin offset of the document.
 struct Layout
 {
-    enum Origin
-    {
-        TopLeft,
-        BottomLeft,
-        TopRight,
-        BottomRight
-    };
-
-    explicit Layout(Dimensions const &dimensions = Dimensions(400, 300),
-                    Origin origin = BottomLeft, double scale = 1,
+    explicit Layout(Size const &dimensions = Size(400, 300), double scale = 1,
                     Point const &origin_offset = Point(0, 0))
-        : dimensions(dimensions),
-          scale(scale),
-          origin(origin),
-          origin_offset(origin_offset)
+        : dimensions(dimensions), scale(scale), origin_offset(origin_offset)
     {
     }
-    Dimensions dimensions;
+    Size dimensions;
     double scale;
-    Origin origin;
     Point origin_offset;
 };
 
 // Convert coordinates in user space to SVG native space.
 double translateX(double x, Layout const &layout)
 {
-    if (layout.origin == Layout::BottomRight ||
-        layout.origin == Layout::TopRight)
-        return layout.dimensions.width -
-               ((x + layout.origin_offset.x) * layout.scale);
-    else
-        return (layout.origin_offset.x + x) * layout.scale;
+    return (layout.origin_offset.x + x) * layout.scale;
 }
 
 double translateY(double y, Layout const &layout)
 {
-    if (layout.origin == Layout::BottomLeft ||
-        layout.origin == Layout::BottomRight)
-        return layout.dimensions.height -
-               ((y + layout.origin_offset.y) * layout.scale);
-    else
-        return (layout.origin_offset.y + y) * layout.scale;
+    return layout.dimensions.height -
+           ((y + layout.origin_offset.y) * layout.scale);
 }
 double translateScale(double dimension, Layout const &layout)
 {
@@ -635,7 +588,7 @@ class Text : public Shape
 class LineChart : public Shape
 {
    public:
-    explicit LineChart(Dimensions margin = Dimensions(), double scale = 1,
+    explicit LineChart(Size margin = Size(), double scale = 1,
                        Stroke const &axis_stroke = Stroke(.5, Color::Purple))
         : axis_stroke(axis_stroke), margin(margin), scale(scale)
     {
@@ -665,16 +618,16 @@ class LineChart : public Shape
 
    private:
     Stroke axis_stroke;
-    Dimensions margin;
+    Size margin;
     double scale;
     std::vector<Polyline> polylines;
 
-    optional<Dimensions> getDimensions() const
+    std::optional<Size> getSize() const
     {
-        if (polylines.empty()) return optional<Dimensions>();
+        if (polylines.empty()) return std::nullopt;
 
-        optional<Point> min = getMinPoint(polylines[0].points);
-        optional<Point> max = getMaxPoint(polylines[0].points);
+        std::optional<Point> min = getMinPoint(polylines[0].points);
+        std::optional<Point> max = getMaxPoint(polylines[0].points);
         for (unsigned i = 0; i < polylines.size(); ++i)
         {
             if (getMinPoint(polylines[i].points)->x < min->x)
@@ -687,12 +640,11 @@ class LineChart : public Shape
                 max->y = getMaxPoint(polylines[i].points)->y;
         }
 
-        return optional<Dimensions>(
-            Dimensions(max->x - min->x, max->y - min->y));
+        return Size(max->x - min->x, max->y - min->y);
     }
     std::string axisString(Layout const &layout) const
     {
-        optional<Dimensions> dimensions = getDimensions();
+        std::optional<Size> dimensions = getSize();
         if (!dimensions) return "";
 
         // Make the axis 10% wider and higher than the data points.
@@ -716,7 +668,7 @@ class LineChart : public Shape
         std::vector<Circle> vertices;
         for (unsigned i = 0; i < shifted_polyline.points.size(); ++i)
             vertices.push_back(Circle(shifted_polyline.points[i],
-                                      getDimensions()->height / 30.0,
+                                      getSize()->height / 30.0,
                                       Fill(Color::Black)));
 
         return shifted_polyline.toString(layout) +
