@@ -515,7 +515,7 @@ class Polygon : public Shape
         : Shape(fill, stroke)
     {
     }
-    explicit Polygon(Stroke const &stroke = Stroke())
+    explicit Polygon(Stroke const &stroke)
         : Shape(Fill(Color::Transparent), stroke)
     {
     }
@@ -560,7 +560,7 @@ class Polyline : public Shape
         : Shape(fill, stroke)
     {
     }
-    explicit Polyline(Stroke const &stroke = Stroke())
+    explicit Polyline(Stroke const &stroke)
         : Shape(Fill(Color::Transparent), stroke)
     {
     }
