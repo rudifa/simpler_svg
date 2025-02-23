@@ -7,8 +7,7 @@ using namespace svg;
 // Test the Color class
 TEST(ColorTest, Constructor)
 {
-    Layout layout = Layout(Size(100, 100),
-                           Layout::BottomLeft);  // default is BottomLeft
+    Layout layout = Layout(Size(100, 100));
     Color c(100, 150, 200);
     EXPECT_EQ(c.toString(layout), "rgb(100,150,200)");
 }
@@ -33,10 +32,9 @@ TEST(SizeTest, Constructor)
 TEST(LayoutTest, Constructor)
 {
     Size d(100, 100);
-    Layout l(d, Layout::BottomLeft);
+    Layout l(d);
     EXPECT_EQ(l.dimensions.width, 100);
     EXPECT_EQ(l.dimensions.height, 100);
-    EXPECT_EQ(l.origin, Layout::BottomLeft);
 }
 
 // Test the Circle class
@@ -44,7 +42,7 @@ TEST(CircleTest, Constructor)
 {
     Point center(50, 50);
     Circle c(center, 30, Fill(Color::Red), Stroke(2, Color::Blue));
-    Layout l(Size(100, 100), Layout::BottomLeft);
+    Layout l(Size(100, 100));
     std::string expected =
         "\t<circle cx=\"50\" cy=\"50\" r=\"15\" fill=\"rgb(255,0,0)\" "
         "stroke-width=\"2\" stroke=\"rgb(0,0,255)\" />\n";
@@ -56,7 +54,7 @@ TEST(ElipseTest, Constructor)
 {
     Point center(50, 50);
     Elipse e(center, 30, 40, Fill(Color::Red), Stroke(2, Color::Blue));
-    Layout l(Size(100, 100), Layout::BottomLeft);
+    Layout l(Size(100, 100));
     std::string expected =
         "\t<ellipse cx=\"50\" cy=\"50\" rx=\"15\" ry=\"20\" "
         "fill=\"rgb(255,0,0)\" "
@@ -69,9 +67,9 @@ TEST(RectangleTest, Constructor)
 {
     Point origin(10, 20);
     Rectangle r(origin, 50, 30, Fill(Color::Green));
-    Layout l(Size(100, 100), Layout::TopLeft);
+    Layout l(Size(100, 100));
     std::string expected =
-        "\t<rect x=\"10\" y=\"20\" width=\"50\" height=\"30\" "
+        "\t<rect x=\"10\" y=\"80\" width=\"50\" height=\"30\" "
         "fill=\"rgb(0,128,0)\" />\n";
     EXPECT_EQ(r.toString(l), expected);
 }
@@ -82,7 +80,7 @@ TEST(LineTest, Constructor)
     Point start(0, 0);
     Point end(100, 100);
     Line line(start, end, Stroke(2, Color::Black));
-    Layout l(Size(200, 200), Layout::BottomLeft);
+    Layout l(Size(200, 200));
     std::string expected =
         "\t<line x1=\"0\" y1=\"200\" x2=\"100\" y2=\"100\" stroke-width=\"2\" "
         "stroke=\"rgb(0,0,0)\" />\n";
@@ -97,7 +95,7 @@ TEST(PolygonTest, Constructor)
     polygon << Point(100, 0);
     polygon << Point(100, 100);
     polygon << Point(0, 100);
-    Layout l(Size(200, 200), Layout::BottomLeft);
+    Layout l(Size(200, 200));
     std::string expected =
         "\t<polygon points=\"0,200 100,200 100,100 0,100 \" "
         "fill=\"transparent\" />\n";
@@ -112,7 +110,7 @@ TEST(PolylineTest, Constructor)
     polyline << Point(100, 0);
     polyline << Point(100, 100);
     polyline << Point(0, 100);
-    Layout l(Size(200, 200), Layout::BottomLeft);
+    Layout l(Size(200, 200));
     std::string expected =
         "\t<polyline points=\"0,200 100,200 100,100 0,100 \" "
         "fill=\"transparent\" />\n";
@@ -124,9 +122,9 @@ TEST(TextTest, Constructor)
 {
     Point pos(10, 20);
     Text text(pos, "Hello, SVG!", Fill(Color::Blue), Font(12, "Arial"));
-    Layout l(Size(100, 100), Layout::TopLeft);
+    Layout l(Size(100, 100));
     std::string expected =
-        "\t<text x=\"10\" y=\"20\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
+        "\t<text x=\"10\" y=\"80\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
         "font-family=\"Arial\" >Hello, SVG!</text>\n";
     EXPECT_EQ(text.toString(l), expected);
 }
@@ -140,7 +138,7 @@ TEST(LineChartTest, Constructor)
              << Point(300, 300) << Point(400, 400) << Point(500, 500);
     chart << polyline;
 
-    Layout l(Size(600, 600), Layout::BottomLeft);
+    Layout l(Size(600, 600));
     std::string expected =
         "\t<polyline points=\"0,600 100,500 200,400 300,300 400,200 500,100 \" "
         "fill=\"transparent\" />\n\t<circle cx=\"0\" cy=\"600\" r=\"8.33333\" "
@@ -159,7 +157,7 @@ TEST(LineChartTest, Constructor)
 TEST(DocumentTest, SaveAndLoad)
 {
     Size dimensions(100, 100);
-    Document doc("test.svg", Layout(dimensions, Layout::BottomLeft));
+    Document doc("test.svg", Layout(dimensions));
 
     doc << Circle(Point(50, 50), 30, Fill(Color::Red));
 
