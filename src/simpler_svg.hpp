@@ -218,7 +218,7 @@ class Color : public Serializeable
         }
     }
     virtual ~Color() override {}
-    std::string toString(Layout const &) const override
+    std::string toString(Layout const &layout = Layout()) const override
     {
         std::stringstream ss;
         if (transparent)
@@ -250,10 +250,10 @@ class Fill : public Serializeable
     {
     }
     explicit Fill(Color color) : color(color) {}
-    std::string toString(Layout const &layout) const override
+    std::string toString(Layout const &layout = Layout()) const override
     {
         std::stringstream ss;
-        ss << attribute("fill", color.toString(layout));
+        ss << attribute("fill", color.toString());
         return ss.str();
     }
 
@@ -277,7 +277,7 @@ class Stroke : public Serializeable
 
         std::stringstream ss;
         ss << attribute("stroke-width", translateScale(width, layout))
-           << attribute("stroke", color.toString(layout));
+           << attribute("stroke", color.toString());
         return ss.str();
     }
 

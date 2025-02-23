@@ -39,9 +39,8 @@ using namespace svg;
 // Test the Color class
 TEST(ColorTest, Constructor)
 {
-    Layout layout = Layout(Size(100, 100));
     Color c(100, 150, 200);
-    EXPECT_EQ(c.toString(layout), "rgb(100,150,200)");
+    EXPECT_EQ(c.toString(), "rgb(100,150,200)");
 }
 
 // Test the Point class
