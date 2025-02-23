@@ -750,6 +750,8 @@ class Document
         return true;
     }
 
+    std::string filename() const { return file_name; }
+
    private:
     std::string file_name;
     Layout layout;

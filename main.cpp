@@ -84,5 +84,14 @@ int main()
 
     doc << Rectangle(Point(70, 55), 20, 15, Color::Yellow);
 
-    doc.save();
+    if (doc.save())
+    {
+        std::cout << "Saved " << doc.filename() << std::endl;
+        return 0;
+    }
+    else
+    {
+        std::cerr << "Failed to save " << doc.filename() << std::endl;
+        return 1;
+    }
 }
