@@ -61,12 +61,10 @@ std::string elemEnd(std::string const &element_name)
 }
 std::string emptyElemEnd() { return "/>\n"; }
 
-struct Dimensions
+struct Size
 {
-    Dimensions(double width, double height) : width(width), height(height) {}
-    explicit Dimensions(double combined = 0) : width(combined), height(combined)
-    {
-    }
+    Size(double width, double height) : width(width), height(height) {}
+    explicit Size(double combined = 0) : width(combined), height(combined) {}
     double width;
     double height;
 };
@@ -113,7 +111,7 @@ struct Layout
         BottomRight
     };
 
-    explicit Layout(Dimensions const &dimensions = Dimensions(400, 300),
+    explicit Layout(Size const &dimensions = Size(400, 300),
                     Origin origin = BottomLeft, double scale = 1,
                     Point const &origin_offset = Point(0, 0))
         : dimensions(dimensions),
@@ -122,7 +120,7 @@ struct Layout
           origin_offset(origin_offset)
     {
     }
-    Dimensions dimensions;
+    Size dimensions;
     double scale;
     Origin origin;
     Point origin_offset;
@@ -612,7 +610,7 @@ class Text : public Shape
 class LineChart : public Shape
 {
    public:
-    explicit LineChart(Dimensions margin = Dimensions(), double scale = 1,
+    explicit LineChart(Size margin = Size(), double scale = 1,
                        Stroke const &axis_stroke = Stroke(.5, Color::Purple))
         : axis_stroke(axis_stroke), margin(margin), scale(scale)
     {
@@ -642,11 +640,11 @@ class LineChart : public Shape
 
    private:
     Stroke axis_stroke;
-    Dimensions margin;
+    Size margin;
     double scale;
     std::vector<Polyline> polylines;
 
-    std::optional<Dimensions> getDimensions() const
+    std::optional<Size> getSize() const
     {
         if (polylines.empty()) return std::nullopt;
 
@@ -664,11 +662,11 @@ class LineChart : public Shape
                 max->y = getMaxPoint(polylines[i].points)->y;
         }
 
-        return Dimensions(max->x - min->x, max->y - min->y);
+        return Size(max->x - min->x, max->y - min->y);
     }
     std::string axisString(Layout const &layout) const
     {
-        std::optional<Dimensions> dimensions = getDimensions();
+        std::optional<Size> dimensions = getSize();
         if (!dimensions) return "";
 
         // Make the axis 10% wider and higher than the data points.
@@ -692,7 +690,7 @@ class LineChart : public Shape
         std::vector<Circle> vertices;
         for (unsigned i = 0; i < shifted_polyline.points.size(); ++i)
             vertices.push_back(Circle(shifted_polyline.points[i],
-                                      getDimensions()->height / 30.0,
+                                      getSize()->height / 30.0,
                                       Fill(Color::Black)));
 
         return shifted_polyline.toString(layout) +

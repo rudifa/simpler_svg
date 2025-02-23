@@ -38,19 +38,18 @@ using namespace svg;
 
 int main()
 {
-    Dimensions dimensions(100, 100);
-    Document doc("my_svg.svg", Layout(dimensions, Layout::BottomLeft));
+    Size size(100, 100);
+    Document doc("my_svg.svg", Layout(size, Layout::BottomLeft));
 
     // Red image border.
     Polygon border(Stroke(1, Color::Red));
-    border << Point(0, 0) << Point(dimensions.width, 0)
-           << Point(dimensions.width, dimensions.height)
-           << Point(0, dimensions.height);
+    border << Point(0, 0) << Point(size.width, 0)
+           << Point(size.width, size.height) << Point(0, size.height);
     doc << border;
 
     // Long notation.  Local variable is created, children are added to
     // varaible.
-    LineChart chart(Dimensions(), 5.0);
+    LineChart chart(Size(), 5.0);
     Polyline polyline_a(Stroke(.5, Color::Blue));
     Polyline polyline_b(Stroke(.5, Color::Aqua));
     Polyline polyline_c(Stroke(.5, Color::Fuchsia));
@@ -65,7 +64,7 @@ int main()
 
     // Condensed notation, parenthesis isolate temporaries that are inserted
     // into parents.
-    doc << (LineChart(Dimensions(65, 5))
+    doc << (LineChart(Size(65, 5))
             << (Polyline(Stroke(.5, Color::Blue))
                 << Point(0, 0) << Point(10, 8) << Point(20, 13))
             << (Polyline(Stroke(.5, Color::Orange))
