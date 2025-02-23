@@ -43,6 +43,13 @@ TEST(ColorTest, Constructor)
     EXPECT_EQ(c.toString(), "rgb(100,150,200)");
 }
 
+// Test the Fill class
+TEST(FillTest, Constructor)
+{
+    Fill f(Color::Red);
+    EXPECT_EQ(f.toString(), "fill=\"rgb(255,0,0)\" ");
+}
+
 // Test the Point class
 TEST(PointTest, Constructor)
 {
