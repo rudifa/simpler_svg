@@ -293,8 +293,11 @@ class Color : public Serializeable
 class Fill : public Serializeable
 {
    public:
-    explicit Fill(Color::Defaults color) : color(color) {}
-    explicit Fill(Color color = Color::Transparent) : color(color) {}
+    explicit Fill(Color::Defaults color = Color::Transparent)
+        : color(Color(color))
+    {
+    }
+    explicit Fill(Color color) : color(color) {}
     std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
@@ -309,10 +312,12 @@ class Fill : public Serializeable
 class Stroke : public Serializeable
 {
    public:
-    explicit Stroke(double width = -1, Color color = Color::Transparent)
-        : width(width), color(color)
+    explicit Stroke(double width = -1,
+                    Color::Defaults color = Color::Transparent)
+        : width(width), color(Color(color))
     {
     }
+    explicit Stroke(double width, Color color) : width(width), color(color) {}
     std::string toString(Layout const &layout) const override
     {
         // If stroke width is invalid.
@@ -511,7 +516,7 @@ class Polygon : public Shape
     {
     }
     explicit Polygon(Stroke const &stroke = Stroke())
-        : Shape(Color::Transparent, stroke)
+        : Shape(Fill(Color::Transparent), stroke)
     {
     }
     Polygon &operator<<(Point const &point)
@@ -556,7 +561,7 @@ class Polyline : public Shape
     {
     }
     explicit Polyline(Stroke const &stroke = Stroke())
-        : Shape(Color::Transparent, stroke)
+        : Shape(Fill(Color::Transparent), stroke)
     {
     }
     explicit Polyline(std::vector<Point> const &points,
@@ -695,7 +700,7 @@ class LineChart : public Shape
         double height = dimensions->height * 1.1;
 
         // Draw the axis.
-        Polyline axis(Color::Transparent, axis_stroke);
+        Polyline axis(Fill(Color::Transparent), axis_stroke);
         axis << Point(margin.width, margin.height + height)
              << Point(margin.width, margin.height)
              << Point(margin.width + width, margin.height);
@@ -712,7 +717,7 @@ class LineChart : public Shape
         for (unsigned i = 0; i < shifted_polyline.points.size(); ++i)
             vertices.push_back(Circle(shifted_polyline.points[i],
                                       getDimensions()->height / 30.0,
-                                      Color::Black));
+                                      Fill(Color::Black)));
 
         return shifted_polyline.toString(layout) +
                vectorToString(vertices, layout);
@@ -733,7 +738,7 @@ class Document
         body_nodes_str += shape.toString(layout);
         return *this;
     }
-    std::string toString() const override
+    std::string toString() const
     {
         std::stringstream ss;
         ss << "<?xml " << attribute("version", "1.0")
