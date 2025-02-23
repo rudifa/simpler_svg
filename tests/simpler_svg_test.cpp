@@ -33,8 +33,8 @@ TEST(LayoutTest, Constructor)
 {
     Size d(100, 100);
     Layout l(d);
-    EXPECT_EQ(l.dimensions.width, 100);
-    EXPECT_EQ(l.dimensions.height, 100);
+    EXPECT_EQ(l.size.width, 100);
+    EXPECT_EQ(l.size.height, 100);
 }
 
 // Test the Circle class
@@ -156,8 +156,8 @@ TEST(LineChartTest, Constructor)
 // Test the Document class
 TEST(DocumentTest, SaveAndLoad)
 {
-    Size dimensions(100, 100);
-    Document doc("test.svg", Layout(dimensions));
+    Size size(100, 100);
+    Document doc("test.svg", Layout(size));
 
     doc << Circle(Point(50, 50), 30, Fill(Color::Red));
 
