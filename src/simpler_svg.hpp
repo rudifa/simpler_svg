@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -60,30 +61,6 @@ std::string elemEnd(std::string const &element_name)
 }
 std::string emptyElemEnd() { return "/>\n"; }
 
-// Quick optional return type.  This allows functions to return an invalid
-//  value if no good return is possible.  The user checks for validity
-//  before using the returned value.
-template <typename T>
-class optional
-{
-   public:
-    explicit optional<T>(T const &type) : valid(true), type(type) {}
-    optional<T>() : valid(false), type(T()) {}
-    T *operator->()
-    {
-        // If we try to access an invalid value, an exception is thrown.
-        if (!valid) throw std::exception();
-
-        return &type;
-    }
-    // Test for validity.
-    bool operator!() const { return !valid; }
-
-   private:
-    bool valid;
-    T type;
-};
-
 struct Dimensions
 {
     Dimensions(double width, double height) : width(width), height(height) {}
@@ -100,9 +77,9 @@ struct Point
     double x;
     double y;
 };
-optional<Point> getMinPoint(std::vector<Point> const &points)
+std::optional<Point> getMinPoint(std::vector<Point> const &points)
 {
-    if (points.empty()) return optional<Point>();
+    if (points.empty()) return std::nullopt;
 
     Point min = points[0];
     for (unsigned i = 0; i < points.size(); ++i)
@@ -110,11 +87,11 @@ optional<Point> getMinPoint(std::vector<Point> const &points)
         if (points[i].x < min.x) min.x = points[i].x;
         if (points[i].y < min.y) min.y = points[i].y;
     }
-    return optional<Point>(min);
+    return min;
 }
-optional<Point> getMaxPoint(std::vector<Point> const &points)
+std::optional<Point> getMaxPoint(std::vector<Point> const &points)
 {
-    if (points.empty()) return optional<Point>();
+    if (points.empty()) return std::nullopt;
 
     Point max = points[0];
     for (unsigned i = 0; i < points.size(); ++i)
@@ -122,7 +99,7 @@ optional<Point> getMaxPoint(std::vector<Point> const &points)
         if (points[i].x > max.x) max.x = points[i].x;
         if (points[i].y > max.y) max.y = points[i].y;
     }
-    return optional<Point>(max);
+    return max;
 }
 
 // Defines the dimensions, scale, origin, and origin offset of the document.
@@ -669,12 +646,12 @@ class LineChart : public Shape
     double scale;
     std::vector<Polyline> polylines;
 
-    optional<Dimensions> getDimensions() const
+    std::optional<Dimensions> getDimensions() const
     {
-        if (polylines.empty()) return optional<Dimensions>();
+        if (polylines.empty()) return std::nullopt;
 
-        optional<Point> min = getMinPoint(polylines[0].points);
-        optional<Point> max = getMaxPoint(polylines[0].points);
+        std::optional<Point> min = getMinPoint(polylines[0].points);
+        std::optional<Point> max = getMaxPoint(polylines[0].points);
         for (unsigned i = 0; i < polylines.size(); ++i)
         {
             if (getMinPoint(polylines[i].points)->x < min->x)
@@ -687,12 +664,11 @@ class LineChart : public Shape
                 max->y = getMaxPoint(polylines[i].points)->y;
         }
 
-        return optional<Dimensions>(
-            Dimensions(max->x - min->x, max->y - min->y));
+        return Dimensions(max->x - min->x, max->y - min->y);
     }
     std::string axisString(Layout const &layout) const
     {
-        optional<Dimensions> dimensions = getDimensions();
+        std::optional<Dimensions> dimensions = getDimensions();
         if (!dimensions) return "";
 
         // Make the axis 10% wider and higher than the data points.
