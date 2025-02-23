@@ -50,7 +50,7 @@ int main()
 
     // Long notation.  Local variable is created, children are added to
     // varaible.
-    LineChart chart(5.0);
+    LineChart chart(Dimensions(), 5.0);
     Polyline polyline_a(Stroke(.5, Color::Blue));
     Polyline polyline_b(Stroke(.5, Color::Aqua));
     Polyline polyline_c(Stroke(.5, Color::Fuchsia));
@@ -76,13 +76,24 @@ int main()
     doc << Circle(Point(80, 80), 20, Fill(Color(100, 200, 120)),
                   Stroke(1, Color(200, 250, 150)));
 
-    doc << Text(Point(5, 77), "Simple SVG", Color::Silver, Font(10, "Verdana"));
+    doc << Text(Point(5, 77), "Simple SVG", Fill(Color::Silver),
+                Font(10, "Verdana"));
 
-    doc << (Polygon(Color(200, 160, 220), Stroke(.5, Color(150, 160, 200)))
+    doc << (Polygon(Fill(Color(200, 160, 220)),
+                    Stroke(.5, Color(150, 160, 200)))
             << Point(20, 70) << Point(25, 72) << Point(33, 70) << Point(35, 60)
             << Point(25, 55) << Point(18, 63));
 
-    doc << Rectangle(Point(70, 55), 20, 15, Color::Yellow);
+    doc << Rectangle(Point(70, 55), 20, 15, Fill(Color::Yellow));
 
-    doc.save();
+    if (doc.save())
+    {
+        std::cout << "Saved " << doc.filename() << std::endl;
+        return 0;
+    }
+    else
+    {
+        std::cerr << "Failed to save " << doc.filename() << std::endl;
+        return 1;
+    }
 }
