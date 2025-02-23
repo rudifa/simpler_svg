@@ -3,7 +3,7 @@ project(simpler_svg)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(simpler_svg main_1.0.0.cpp)
+add_executable(simpler_svg main.cpp)
 
 # Specify the installation directory
 install(TARGETS simpler_svg DESTINATION bin)
