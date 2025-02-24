@@ -407,7 +407,7 @@ class Rectangle : public Shape
     {
         std::stringstream ss;
         ss << elemStart("rect") << attribute("x", translateX(edge.x, layout))
-           << attribute("y", translateY(edge.y, layout))
+           << attribute("y", translateY(edge.y, layout) - height)
            << attribute("width", translateScale(width, layout))
            << attribute("height", translateScale(height, layout))
            << fill.toString(layout) << stroke.toString(layout)

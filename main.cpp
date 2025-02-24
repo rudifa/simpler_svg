@@ -90,7 +90,7 @@ int main()
 
     Group g("G1");
     g.addShape(std::make_unique<Circle>(Point(0, 0), 30, Fill(Color::Red)));
-    g.addShape(std::make_unique<Rectangle>(Point(0, 15), 30, 15, Fill(),
+    g.addShape(std::make_unique<Rectangle>(Point(0, 0), 30, 15, Fill(),
                                            Stroke(1, Color::Black)));
     doc << g;
 

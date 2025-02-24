@@ -137,7 +137,7 @@ TEST(RectangleTest, Constructor)
     Rectangle r(origin, 50, 30, Fill(Color::Green));
     Layout l(Size(100, 100));
     std::string expected =
-        "\t<rect x=\"10\" y=\"80\" width=\"50\" height=\"30\" "
+        "\t<rect x=\"10\" y=\"50\" width=\"50\" height=\"30\" "
         "fill=\"rgb(0,128,0)\" />\n";
     EXPECT_EQ(r.toString(l), expected);
 }
@@ -244,7 +244,7 @@ TEST(GroupTest, Constructor)
     Layout l(Size(600, 600));
     std::string expected =
         "\t<g >\n"
-        "\t\t<rect x=\"100\" y=\"500\" width=\"200\" height=\"150\" "
+        "\t\t<rect x=\"100\" y=\"350\" width=\"200\" height=\"150\" "
         "fill=\"rgb(0,0,255)\" />\n"
         "\t\t<circle cx=\"300\" cy=\"400\" r=\"25\" fill=\"rgb(255,0,0)\" />\n"
         "\t</g>\n";
