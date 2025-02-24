@@ -100,15 +100,15 @@ std::optional<Point> getMaxPoint(std::vector<Point> const &points)
     return max;
 }
 
-// Defines the dimensions, scale, origin, and origin offset of the document.
+// Defines the size, scale, origin, and origin offset of the document.
 struct Layout
 {
-    explicit Layout(Size const &dimensions = Size(400, 300), double scale = 1,
+    explicit Layout(Size const &size = Size(400, 300), double scale = 1,
                     Point const &origin_offset = Point(0, 0))
-        : dimensions(dimensions), scale(scale), origin_offset(origin_offset)
+        : size(size), scale(scale), origin_offset(origin_offset)
     {
     }
-    Size dimensions;
+    Size size;
     double scale;
     Point origin_offset;
 };
@@ -121,8 +121,7 @@ double translateX(double x, Layout const &layout)
 
 double translateY(double y, Layout const &layout)
 {
-    return layout.dimensions.height -
-           ((y + layout.origin_offset.y) * layout.scale);
+    return layout.size.height - ((y + layout.origin_offset.y) * layout.scale);
 }
 double translateScale(double dimension, Layout const &layout)
 {
@@ -219,7 +218,7 @@ class Color : public Serializeable
         }
     }
     virtual ~Color() override {}
-    std::string toString(Layout const &) const override
+    std::string toString(Layout const &layout = Layout()) const override
     {
         std::stringstream ss;
         if (transparent)
@@ -251,10 +250,10 @@ class Fill : public Serializeable
     {
     }
     explicit Fill(Color color) : color(color) {}
-    std::string toString(Layout const &layout) const override
+    std::string toString(Layout const &layout = Layout()) const override
     {
         std::stringstream ss;
-        ss << attribute("fill", color.toString(layout));
+        ss << attribute("fill", color.toString());
         return ss.str();
     }
 
@@ -265,8 +264,7 @@ class Fill : public Serializeable
 class Stroke : public Serializeable
 {
    public:
-    explicit Stroke(double width = -1,
-                    Color::Defaults color = Color::Transparent)
+    explicit Stroke(double width = 0, Color::Defaults color = Color::Silver)
         : width(width), color(Color(color))
     {
     }
@@ -274,11 +272,11 @@ class Stroke : public Serializeable
     std::string toString(Layout const &layout) const override
     {
         // If stroke width is invalid.
-        if (width < 0) return std::string();
+        if (width <= 0) return std::string();
 
         std::stringstream ss;
         ss << attribute("stroke-width", translateScale(width, layout))
-           << attribute("stroke", color.toString(layout));
+           << attribute("stroke", color.toString());
         return ss.str();
     }
 
@@ -644,12 +642,12 @@ class LineChart : public Shape
     }
     std::string axisString(Layout const &layout) const
     {
-        std::optional<Size> dimensions = getSize();
-        if (!dimensions) return "";
+        std::optional<Size> size = getSize();
+        if (!size) return "";
 
         // Make the axis 10% wider and higher than the data points.
-        double width = dimensions->width * 1.1;
-        double height = dimensions->height * 1.1;
+        double width = size->width * 1.1;
+        double height = size->height * 1.1;
 
         // Draw the axis.
         Polyline axis(Fill(Color::Transparent), axis_stroke);
@@ -697,8 +695,8 @@ class Document
            << attribute("standalone", "no")
            << "?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" "
            << "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg "
-           << attribute("width", layout.dimensions.width, "px")
-           << attribute("height", layout.dimensions.height, "px")
+           << attribute("width", layout.size.width, "px")
+           << attribute("height", layout.size.height, "px")
            << attribute("xmlns", "http://www.w3.org/2000/svg")
            << attribute("version", "1.1") << ">\n"
            << body_nodes_str << elemEnd("svg");

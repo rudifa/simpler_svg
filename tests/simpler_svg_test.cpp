@@ -1,3 +1,35 @@
+
+/*******************************************************************************
+*  The "New BSD License" : http://www.opensource.org/licenses/bsd-license.php  *
+********************************************************************************
+
+Copyright (c) 2025, Rudolf Farkas
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the <organization> nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+******************************************************************************/
+
 #include "../src/simpler_svg.hpp"
 
 #include <gtest/gtest.h>
@@ -7,9 +39,15 @@ using namespace svg;
 // Test the Color class
 TEST(ColorTest, Constructor)
 {
-    Layout layout = Layout(Size(100, 100));
     Color c(100, 150, 200);
-    EXPECT_EQ(c.toString(layout), "rgb(100,150,200)");
+    EXPECT_EQ(c.toString(), "rgb(100,150,200)");
+}
+
+// Test the Fill class
+TEST(FillTest, Constructor)
+{
+    Fill f(Color::Red);
+    EXPECT_EQ(f.toString(), "fill=\"rgb(255,0,0)\" ");
 }
 
 // Test the Point class
@@ -33,8 +71,38 @@ TEST(LayoutTest, Constructor)
 {
     Size d(100, 100);
     Layout l(d);
-    EXPECT_EQ(l.dimensions.width, 100);
-    EXPECT_EQ(l.dimensions.height, 100);
+    EXPECT_EQ(l.size.width, 100);
+    EXPECT_EQ(l.size.height, 100);
+    EXPECT_EQ(l.origin_offset.x, 0);
+    EXPECT_EQ(l.origin_offset.y, 0);
+    EXPECT_EQ(l.scale, 1.0);
+    Layout l2(d, 2.0, Point(10, 10));
+    EXPECT_EQ(l2.size.width, 100);
+    EXPECT_EQ(l2.size.height, 100);
+    EXPECT_EQ(l2.origin_offset.x, 10);
+    EXPECT_EQ(l2.origin_offset.y, 10);
+    EXPECT_EQ(l2.scale, 2.0);
+}
+
+// Test the Stroke class
+TEST(StrokeTest, Constructor)
+{
+    Layout l1;
+    Layout l2(Size(100, 100), 3.0, Point(10, 10));
+
+    Stroke s0;
+    EXPECT_EQ(s0.toString(l1), "");
+    EXPECT_EQ(s0.toString(l2), "");
+
+    Stroke s1(1);
+    EXPECT_EQ(s1.toString(l1),
+              "stroke-width=\"1\" stroke=\"rgb(192,192,192)\" ");
+    EXPECT_EQ(s1.toString(l2),
+              "stroke-width=\"3\" stroke=\"rgb(192,192,192)\" ");
+
+    Stroke s2(2, Color::Red);
+    EXPECT_EQ(s2.toString(l1), "stroke-width=\"2\" stroke=\"rgb(255,0,0)\" ");
+    EXPECT_EQ(s2.toString(l2), "stroke-width=\"6\" stroke=\"rgb(255,0,0)\" ");
 }
 
 // Test the Circle class
@@ -156,8 +224,8 @@ TEST(LineChartTest, Constructor)
 // Test the Document class
 TEST(DocumentTest, SaveAndLoad)
 {
-    Size dimensions(100, 100);
-    Document doc("test.svg", Layout(dimensions));
+    Size size(100, 100);
+    Document doc("test.svg", Layout(size));
 
     doc << Circle(Point(50, 50), 30, Fill(Color::Red));
 

@@ -18,7 +18,9 @@ cd build
 cmake ..
 make
 
-./simpler_svg
+./simpler_svg # Run the main demo
+
+./simpler_svg_test # Run the google test
 ```
 
 ## Original source files
