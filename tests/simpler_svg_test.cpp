@@ -228,6 +228,29 @@ TEST(LineChartTest, Constructor)
     EXPECT_EQ(chart.toString(l), expected);
 }
 
+// Test the Group class
+TEST(GroupTest, Constructor)
+{
+    Group group;
+
+    // Create a Rectangle
+    Rectangle rect(Point(100, 100), 200, 150, Fill(Color::Blue));
+    group.addShape(std::make_unique<Rectangle>(rect));
+
+    // Create a Circle
+    Circle circle(Point(300, 200), 50, Fill(Color::Red));
+    group.addShape(std::make_unique<Circle>(circle));
+
+    Layout l(Size(600, 600));
+    std::string expected =
+        "\t<g >\n"
+        "\t\t<rect x=\"100\" y=\"500\" width=\"200\" height=\"150\" "
+        "fill=\"rgb(0,0,255)\" />\n"
+        "\t\t<circle cx=\"300\" cy=\"400\" r=\"25\" fill=\"rgb(255,0,0)\" />\n"
+        "\t</g>\n";
+    EXPECT_EQ(group.toString(l), expected);
+}
+
 // Test the Document class
 TEST(DocumentTest, SaveAndLoad)
 {
