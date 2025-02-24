@@ -73,6 +73,36 @@ TEST(LayoutTest, Constructor)
     Layout l(d);
     EXPECT_EQ(l.size.width, 100);
     EXPECT_EQ(l.size.height, 100);
+    EXPECT_EQ(l.origin_offset.x, 0);
+    EXPECT_EQ(l.origin_offset.y, 0);
+    EXPECT_EQ(l.scale, 1.0);
+    Layout l2(d, 2.0, Point(10, 10));
+    EXPECT_EQ(l2.size.width, 100);
+    EXPECT_EQ(l2.size.height, 100);
+    EXPECT_EQ(l2.origin_offset.x, 10);
+    EXPECT_EQ(l2.origin_offset.y, 10);
+    EXPECT_EQ(l2.scale, 2.0);
+}
+
+// Test the Stroke class
+TEST(StrokeTest, Constructor)
+{
+    Layout l1;
+    Layout l2(Size(100, 100), 3.0, Point(10, 10));
+
+    Stroke s0;
+    EXPECT_EQ(s0.toString(l1), "");
+    EXPECT_EQ(s0.toString(l2), "");
+
+    Stroke s1(1);
+    EXPECT_EQ(s1.toString(l1),
+              "stroke-width=\"1\" stroke=\"rgb(192,192,192)\" ");
+    EXPECT_EQ(s1.toString(l2),
+              "stroke-width=\"3\" stroke=\"rgb(192,192,192)\" ");
+
+    Stroke s2(2, Color::Red);
+    EXPECT_EQ(s2.toString(l1), "stroke-width=\"2\" stroke=\"rgb(255,0,0)\" ");
+    EXPECT_EQ(s2.toString(l2), "stroke-width=\"6\" stroke=\"rgb(255,0,0)\" ");
 }
 
 // Test the Circle class

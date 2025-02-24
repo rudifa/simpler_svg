@@ -264,8 +264,7 @@ class Fill : public Serializeable
 class Stroke : public Serializeable
 {
    public:
-    explicit Stroke(double width = -1,
-                    Color::Defaults color = Color::Transparent)
+    explicit Stroke(double width = 0, Color::Defaults color = Color::Silver)
         : width(width), color(Color(color))
     {
     }
@@ -273,7 +272,7 @@ class Stroke : public Serializeable
     std::string toString(Layout const &layout) const override
     {
         // If stroke width is invalid.
-        if (width < 0) return std::string();
+        if (width <= 0) return std::string();
 
         std::stringstream ss;
         ss << attribute("stroke-width", translateScale(width, layout))
