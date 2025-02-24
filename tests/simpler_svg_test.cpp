@@ -195,6 +195,13 @@ TEST(TextTest, Constructor)
         "\t<text x=\"10\" y=\"80\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
         "font-family=\"Arial\" >Hello, SVG!</text>\n";
     EXPECT_EQ(text.toString(l), expected);
+
+    text.setRotation(45);
+    std::string expected2 =
+        "\t<text x=\"10\" y=\"80\" transform=\"rotate(-45.000000 10.000000 "
+        "80.000000)\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
+        "font-family=\"Arial\" >Hello, SVG!</text>\n";
+    EXPECT_EQ(text.toString(l), expected2);
 }
 
 // Test the LineChart class

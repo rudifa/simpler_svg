@@ -78,6 +78,9 @@ int main()
     doc << Text(Point(20, 300), "Simple SVG", Fill(Color::Silver),
                 Font(40, "Verdana"));
 
+    doc << Text(Point(20, 300), "Simple SVG", Fill(Color::Silver),
+                Font(20, "Verdana"), Stroke(), 45);
+
     doc << (Polygon(Fill(Color(200, 160, 220)),
                     Stroke(.5, Color(150, 160, 200)))
             << Point(80, 280) << Point(100, 288) << Point(132, 280)

@@ -557,16 +557,30 @@ class Text : public Shape
    public:
     Text(Point const &origin, std::string const &content,
          Fill const &fill = Fill(), Font const &font = Font(),
-         Stroke const &stroke = Stroke())
-        : Shape(fill, stroke), origin(origin), content(content), font(font)
+         Stroke const &stroke = Stroke(), double rotation = 0)
+        : Shape(fill, stroke),
+          origin(origin),
+          content(content),
+          font(font),
+          rotation(rotation)
     {
     }
     std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
         ss << elemStart("text") << attribute("x", translateX(origin.x, layout))
-           << attribute("y", translateY(origin.y, layout))
-           << fill.toString(layout) << stroke.toString(layout)
+           << attribute("y", translateY(origin.y, layout));
+
+        if (rotation != 0)
+        {
+            ss << attribute(
+                "transform",
+                "rotate(" + std::to_string(-rotation) + " " +
+                    std::to_string(translateX(origin.x, layout)) + " " +
+                    std::to_string(translateY(origin.y, layout)) + ")");
+        }
+
+        ss << fill.toString(layout) << stroke.toString(layout)
            << font.toString(layout) << ">" << content << elemEnd("text");
         return ss.str();
     }
@@ -575,11 +589,13 @@ class Text : public Shape
         origin.x += offset.x;
         origin.y += offset.y;
     }
+    void setRotation(double angle) { rotation = angle; }
 
    private:
     Point origin;
     std::string content;
     Font font;
+    double rotation;  // Rotation in degrees
 };
 
 // Sample charting class.
