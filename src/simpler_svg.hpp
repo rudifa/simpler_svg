@@ -407,7 +407,7 @@ class Rectangle : public Shape
     {
         std::stringstream ss;
         ss << elemStart("rect") << attribute("x", translateX(edge.x, layout))
-           << attribute("y", translateY(edge.y, layout))
+           << attribute("y", translateY(edge.y, layout) - height)
            << attribute("width", translateScale(width, layout))
            << attribute("height", translateScale(height, layout))
            << fill.toString(layout) << stroke.toString(layout)
@@ -688,6 +688,51 @@ class LineChart : public Shape
         return shifted_polyline.toString(layout) +
                vectorToString(vertices, layout);
     }
+};
+
+class Group : public Shape
+{
+   public:
+    explicit Group(std::string const &id = "") : id(id) {}
+
+    std::string toString(Layout const &layout) const override
+    {
+        std::stringstream ss;
+        ss << elemStart("g");
+        if (!id.empty())
+        {
+            ss << attribute("id", id);
+        }
+        ss << ">\n";
+
+        for (const auto &child : children)
+        {
+            ss << "\t" << child->toString(layout);
+        }
+        ss << "\t" << elemEnd("g");
+        return ss.str();
+    }
+
+    void offset(Point const &offset) override
+    {
+        for (auto &child : children)
+        {
+            child->offset(offset);
+        }
+    }
+
+    void addShape(std::unique_ptr<Shape> shape)
+    {
+        children.push_back(std::move(shape));
+    }
+
+    size_t size() const { return children.size(); }
+
+    bool empty() const { return children.empty(); }
+
+   private:
+    std::string id;
+    std::vector<std::unique_ptr<Shape>> children;
 };
 
 class Document
