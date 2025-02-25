@@ -89,9 +89,8 @@ int main()
     doc << Rectangle(Point(280, 220), 80, 60, Fill(Color::Yellow));
 
     Group g("G1");
-    g.addShape(std::make_unique<Circle>(Point(0, 0), 30, Fill(Color::Red)));
-    g.addShape(std::make_unique<Rectangle>(Point(0, 0), 30, 15, Fill(),
-                                           Stroke(1, Color::Black)));
+    g << Circle(Point(0, 0), 30, Fill(Color::Red));
+    g << Rectangle(Point(0, 0), 30, 15, Fill(), Stroke(1, Color::Black));
     doc << g;
 
     g.offset(Point(400, 15));
