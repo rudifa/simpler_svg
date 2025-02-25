@@ -233,13 +233,11 @@ TEST(GroupTest, Constructor)
 {
     Group group;
 
-    // Create a Rectangle
-    Rectangle rect(Point(100, 100), 200, 150, Fill(Color::Blue));
-    group.addShape(std::make_unique<Rectangle>(rect));
+    // Add a Rectangle to the group
+    group << Rectangle(Point(100, 100), 200, 150, Fill(Color::Blue));
 
-    // Create a Circle
-    Circle circle(Point(300, 200), 50, Fill(Color::Red));
-    group.addShape(std::make_unique<Circle>(circle));
+    // Add a Circle to the group
+    group << Circle(Point(300, 200), 50, Fill(Color::Red));
 
     Layout l(Size(600, 600));
     std::string expected =

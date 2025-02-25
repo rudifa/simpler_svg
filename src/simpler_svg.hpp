@@ -315,6 +315,7 @@ class Shape : public Serializeable
     virtual ~Shape() override {}
     virtual std::string toString(Layout const &layout) const override = 0;
     virtual void offset(Point const &offset) = 0;
+    virtual std::unique_ptr<Shape> clone() const = 0;
 
    protected:
     Fill fill;
@@ -355,6 +356,11 @@ class Circle : public Shape
         center.y += offset.y;
     }
 
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Circle>(*this);
+    }
+
    private:
     Point center;
     double radius;
@@ -389,6 +395,11 @@ class Elipse : public Shape
         center.y += offset.y;
     }
 
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Elipse>(*this);
+    }
+
    private:
     Point center;
     double radius_width;
@@ -418,6 +429,11 @@ class Rectangle : public Shape
     {
         edge.x += offset.x;
         edge.y += offset.y;
+    }
+
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Rectangle>(*this);
     }
 
    private:
@@ -452,6 +468,11 @@ class Line : public Shape
 
         end_point.x += offset.x;
         end_point.y += offset.y;
+    }
+
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Line>(*this);
     }
 
    private:
@@ -497,6 +518,11 @@ class Polygon : public Shape
             points[i].x += offset.x;
             points[i].y += offset.y;
         }
+    }
+
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Polygon>(*this);
     }
 
    private:
@@ -549,6 +575,12 @@ class Polyline : public Shape
             points[i].y += offset.y;
         }
     }
+
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Polyline>(*this);
+    }
+
     std::vector<Point> points;
 };
 
@@ -589,6 +621,12 @@ class Text : public Shape
         origin.x += offset.x;
         origin.y += offset.y;
     }
+
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<Text>(*this);
+    }
+
     void setRotation(double angle) { rotation = angle; }
 
    private:
@@ -628,6 +666,11 @@ class LineChart : public Shape
     {
         for (unsigned i = 0; i < polylines.size(); ++i)
             polylines[i].offset(offset);
+    }
+
+    virtual std::unique_ptr<Shape> clone() const override
+    {
+        return std::make_unique<LineChart>(*this);
     }
 
    private:
@@ -695,6 +738,15 @@ class Group : public Shape
    public:
     explicit Group(std::string const &id = "") : id(id) {}
 
+    // Copy constructor that performs a deep copy
+    Group(const Group &other) : id(other.id)
+    {
+        for (const auto &child : other.children)
+        {
+            children.push_back(child->clone());
+        }
+    }
+
     std::string toString(Layout const &layout) const override
     {
         std::stringstream ss;
@@ -721,9 +773,15 @@ class Group : public Shape
         }
     }
 
-    void addShape(std::unique_ptr<Shape> shape)
+    virtual std::unique_ptr<Shape> clone() const override
     {
-        children.push_back(std::move(shape));
+        return std::make_unique<Group>(*this);
+    }
+
+    Group &operator<<(Shape const &shape)
+    {
+        children.push_back(shape.clone());
+        return *this;
     }
 
     size_t size() const { return children.size(); }
