@@ -594,7 +594,9 @@ class Text : public Shape
           origin(origin),
           content(content),
           font(font),
-          rotation(rotation)
+          rotation(rotation),
+          text_anchor(""),
+          dominant_baseline("")
     {
     }
     std::string toString(Layout const &layout) const override
@@ -612,10 +614,21 @@ class Text : public Shape
                     std::to_string(translateY(origin.y, layout)) + ")");
         }
 
+        if (!text_anchor.empty())
+        {
+            ss << attribute("text-anchor", text_anchor);
+        }
+
+        if (!dominant_baseline.empty())
+        {
+            ss << attribute("dominant-baseline", dominant_baseline);
+        }
+
         ss << fill.toString(layout) << stroke.toString(layout)
            << font.toString(layout) << ">" << content << elemEnd("text");
         return ss.str();
     }
+
     void offset(Point const &offset) override
     {
         origin.x += offset.x;
@@ -629,11 +642,20 @@ class Text : public Shape
 
     void setRotation(double angle) { rotation = angle; }
 
+    void setTextAnchor(std::string const &anchor) { text_anchor = anchor; }
+
+    void setDominantBaseline(std::string const &baseline)
+    {
+        dominant_baseline = baseline;
+    }
+
    private:
     Point origin;
     std::string content;
     Font font;
     double rotation;  // Rotation in degrees
+    std::string text_anchor;
+    std::string dominant_baseline;
 };
 
 // Sample charting class.
@@ -741,9 +763,9 @@ class Group : public Shape
     // Copy constructor that performs a deep copy
     Group(const Group &other) : id(other.id)
     {
-        for (const auto &child : other.children)
+        for (const auto &child : other.shapes)
         {
-            children.push_back(child->clone());
+            shapes.push_back(child->clone());
         }
     }
 
@@ -757,7 +779,7 @@ class Group : public Shape
         }
         ss << ">\n";
 
-        for (const auto &child : children)
+        for (const auto &child : shapes)
         {
             ss << "\t" << child->toString(layout);
         }
@@ -767,7 +789,7 @@ class Group : public Shape
 
     void offset(Point const &offset) override
     {
-        for (auto &child : children)
+        for (auto &child : shapes)
         {
             child->offset(offset);
         }
@@ -780,17 +802,17 @@ class Group : public Shape
 
     Group &operator<<(Shape const &shape)
     {
-        children.push_back(shape.clone());
+        shapes.push_back(shape.clone());
         return *this;
     }
 
-    size_t size() const { return children.size(); }
+    size_t size() const { return shapes.size(); }
 
-    bool empty() const { return children.empty(); }
+    bool empty() const { return shapes.empty(); }
 
    private:
     std::string id;
-    std::vector<std::unique_ptr<Shape>> children;
+    std::vector<std::unique_ptr<Shape>> shapes;
 };
 
 class Document

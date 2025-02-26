@@ -202,6 +202,16 @@ TEST(TextTest, Constructor)
         "80.000000)\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
         "font-family=\"Arial\" >Hello, SVG!</text>\n";
     EXPECT_EQ(text.toString(l), expected2);
+
+    text.setRotation(0);
+    text.setTextAnchor("middle");
+    text.setDominantBaseline("middle");
+    std::string expected3 =
+        "\t<text x=\"10\" y=\"80\" "
+        "text-anchor=\"middle\" dominant-baseline=\"middle\" "
+        "fill=\"rgb(0,0,255)\" font-size=\"12\" "
+        "font-family=\"Arial\" >Hello, SVG!</text>\n";
+    EXPECT_EQ(text.toString(l), expected3);
 }
 
 // Test the LineChart class
