@@ -589,14 +589,16 @@ class Text : public Shape
    public:
     Text(Point const &origin, std::string const &content,
          Fill const &fill = Fill(), Font const &font = Font(),
-         Stroke const &stroke = Stroke(), double rotation = 0)
+         Stroke const &stroke = Stroke(), double rotation = 0,
+         const std::string &text_anchor = "",
+         const std::string &dominant_baseline = "")
         : Shape(fill, stroke),
           origin(origin),
           content(content),
           font(font),
           rotation(rotation),
-          text_anchor(""),
-          dominant_baseline("")
+          text_anchor(text_anchor),
+          dominant_baseline(dominant_baseline)
     {
     }
     std::string toString(Layout const &layout) const override
