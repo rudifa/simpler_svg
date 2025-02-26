@@ -101,6 +101,13 @@ int main()
                    Stroke(1, Color::Blue));
     g << Rectangle(Point(500 - 50, 0), 50, 50, Fill(), Stroke(1, Color::Blue));
 
+    g << Circle(Point(250, 450), 10, Fill(), Stroke(1, Color::Black));
+    Text centered(Point(250, 450), "Centered Text", Fill(Color::Green),
+                  Font(20, "Arial"));
+    centered.setTextAnchor("middle");
+    centered.setDominantBaseline("middle");
+    g << centered;
+
     doc << g;
 
     if (doc.save())

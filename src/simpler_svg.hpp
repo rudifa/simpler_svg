@@ -594,7 +594,9 @@ class Text : public Shape
           origin(origin),
           content(content),
           font(font),
-          rotation(rotation)
+          rotation(rotation),
+          text_anchor(""),
+          dominant_baseline("")
     {
     }
     std::string toString(Layout const &layout) const override
@@ -612,10 +614,21 @@ class Text : public Shape
                     std::to_string(translateY(origin.y, layout)) + ")");
         }
 
+        if (!text_anchor.empty())
+        {
+            ss << attribute("text-anchor", text_anchor);
+        }
+
+        if (!dominant_baseline.empty())
+        {
+            ss << attribute("dominant-baseline", dominant_baseline);
+        }
+
         ss << fill.toString(layout) << stroke.toString(layout)
            << font.toString(layout) << ">" << content << elemEnd("text");
         return ss.str();
     }
+
     void offset(Point const &offset) override
     {
         origin.x += offset.x;
@@ -629,11 +642,20 @@ class Text : public Shape
 
     void setRotation(double angle) { rotation = angle; }
 
+    void setTextAnchor(std::string const &anchor) { text_anchor = anchor; }
+
+    void setDominantBaseline(std::string const &baseline)
+    {
+        dominant_baseline = baseline;
+    }
+
    private:
     Point origin;
     std::string content;
     Font font;
     double rotation;  // Rotation in degrees
+    std::string text_anchor;
+    std::string dominant_baseline;
 };
 
 // Sample charting class.
