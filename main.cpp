@@ -75,11 +75,11 @@ int main()
     doc << Circle(Point(320, 320), 80, Fill(Color(100, 200, 120)),
                   Stroke(1, Color(200, 250, 150)));
 
-    doc << Text(Point(20, 300), "Simple SVG", Fill(Color::Silver),
-                Font(40, "Verdana"));
+    doc << Text(Point(20, 300), "Simple SVG", Font(40, "Verdana"),
+                Fill(Color::Silver));
 
-    doc << Text(Point(20, 300), "Simple SVG", Fill(Color::Silver),
-                Font(20, "Verdana"), Stroke(), 45);
+    doc << Text(Point(20, 300), "Simple SVG", Font(20, "Verdana"),
+                Fill(Color::Silver), Stroke(), 45);
 
     doc << (Polygon(Fill(Color(200, 160, 220)),
                     Stroke(.5, Color(150, 160, 200)))
@@ -102,8 +102,8 @@ int main()
     g << Rectangle(Point(500 - 50, 0), 50, 50, Fill(), Stroke(1, Color::Blue));
 
     g << Circle(Point(250, 450), 10, Fill(), Stroke(1, Color::Black));
-    Text centered(Point(250, 450), "Centered Text", Fill(Color::Green),
-                  Font(20, "Arial"));
+    Text centered(Point(250, 450), "Centered Text", Font(20, "Arial"),
+                  Fill(Color::Green));
     centered.setTextAnchor("middle");
     centered.setDominantBaseline("middle");
     g << centered;

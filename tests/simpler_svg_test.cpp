@@ -189,29 +189,43 @@ TEST(PolylineTest, Constructor)
 TEST(TextTest, Constructor)
 {
     Point pos(10, 20);
-    Text text(pos, "Hello, SVG!", Fill(Color::Blue), Font(12, "Arial"));
-    Layout l(Size(100, 100));
-    std::string expected =
-        "\t<text x=\"10\" y=\"80\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
-        "font-family=\"Arial\" >Hello, SVG!</text>\n";
-    EXPECT_EQ(text.toString(l), expected);
+    {
+        Text text(pos, "Hello, SVG!", Font(12, "Arial"), Fill(Color::Blue));
+        Layout l(Size(100, 100));
+        std::string expected =
+            "\t<text x=\"10\" y=\"80\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
+            "font-family=\"Arial\" >Hello, SVG!</text>\n";
+        EXPECT_EQ(text.toString(l), expected);
 
-    text.setRotation(45);
-    std::string expected2 =
-        "\t<text x=\"10\" y=\"80\" transform=\"rotate(-45.000000 10.000000 "
-        "80.000000)\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
-        "font-family=\"Arial\" >Hello, SVG!</text>\n";
-    EXPECT_EQ(text.toString(l), expected2);
+        text.setRotation(45);
+        std::string expected2 =
+            "\t<text x=\"10\" y=\"80\" transform=\"rotate(-45.000000 10.000000 "
+            "80.000000)\" fill=\"rgb(0,0,255)\" font-size=\"12\" "
+            "font-family=\"Arial\" >Hello, SVG!</text>\n";
+        EXPECT_EQ(text.toString(l), expected2);
 
-    text.setRotation(0);
-    text.setTextAnchor("middle");
-    text.setDominantBaseline("middle");
-    std::string expected3 =
-        "\t<text x=\"10\" y=\"80\" "
-        "text-anchor=\"middle\" dominant-baseline=\"middle\" "
-        "fill=\"rgb(0,0,255)\" font-size=\"12\" "
-        "font-family=\"Arial\" >Hello, SVG!</text>\n";
-    EXPECT_EQ(text.toString(l), expected3);
+        text.setRotation(0);
+        text.setTextAnchor("middle");
+        text.setDominantBaseline("middle");
+        std::string expected3 =
+            "\t<text x=\"10\" y=\"80\" "
+            "text-anchor=\"middle\" dominant-baseline=\"middle\" "
+            "fill=\"rgb(0,0,255)\" font-size=\"12\" "
+            "font-family=\"Arial\" >Hello, SVG!</text>\n";
+        EXPECT_EQ(text.toString(l), expected3);
+    }
+
+    {
+        Text text(pos, "Hello, SVG!", Font(12, "Arial"), Fill(),
+                  Stroke(1, Color::Blue));
+        Layout l(Size(100, 100));
+        std::string expected =
+            "\t<text x=\"10\" y=\"80\" fill=\"transparent\" "
+            "stroke-width=\"1\" stroke=\"rgb(0,0,255)\" "
+            "font-size=\"12\" "
+            "font-family=\"Arial\" >Hello, SVG!</text>\n";
+        EXPECT_EQ(text.toString(l), expected);
+    }
 }
 
 // Test the LineChart class

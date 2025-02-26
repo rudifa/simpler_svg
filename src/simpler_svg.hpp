@@ -588,7 +588,7 @@ class Text : public Shape
 {
    public:
     Text(Point const &origin, std::string const &content,
-         Fill const &fill = Fill(), Font const &font = Font(),
+         Font const &font = Font(), Fill const &fill = Fill(),
          Stroke const &stroke = Stroke(), double rotation = 0,
          const std::string &text_anchor = "",
          const std::string &dominant_baseline = "")
