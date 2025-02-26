@@ -94,6 +94,13 @@ int main()
     doc << g;
 
     g.offset(Point(400, 15));
+
+    g << Rectangle(Point(0, 0), 50, 50, Fill(), Stroke(1, Color::Blue));
+    g << Rectangle(Point(0, 500 - 50), 50, 50, Fill(), Stroke(1, Color::Blue));
+    g << Rectangle(Point(500 - 50, 500 - 50), 50, 50, Fill(),
+                   Stroke(1, Color::Blue));
+    g << Rectangle(Point(500 - 50, 0), 50, 50, Fill(), Stroke(1, Color::Blue));
+
     doc << g;
 
     if (doc.save())

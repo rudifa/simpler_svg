@@ -741,9 +741,9 @@ class Group : public Shape
     // Copy constructor that performs a deep copy
     Group(const Group &other) : id(other.id)
     {
-        for (const auto &child : other.children)
+        for (const auto &child : other.shapes)
         {
-            children.push_back(child->clone());
+            shapes.push_back(child->clone());
         }
     }
 
@@ -757,7 +757,7 @@ class Group : public Shape
         }
         ss << ">\n";
 
-        for (const auto &child : children)
+        for (const auto &child : shapes)
         {
             ss << "\t" << child->toString(layout);
         }
@@ -767,7 +767,7 @@ class Group : public Shape
 
     void offset(Point const &offset) override
     {
-        for (auto &child : children)
+        for (auto &child : shapes)
         {
             child->offset(offset);
         }
@@ -780,17 +780,17 @@ class Group : public Shape
 
     Group &operator<<(Shape const &shape)
     {
-        children.push_back(shape.clone());
+        shapes.push_back(shape.clone());
         return *this;
     }
 
-    size_t size() const { return children.size(); }
+    size_t size() const { return shapes.size(); }
 
-    bool empty() const { return children.empty(); }
+    bool empty() const { return shapes.empty(); }
 
    private:
     std::string id;
-    std::vector<std::unique_ptr<Shape>> children;
+    std::vector<std::unique_ptr<Shape>> shapes;
 };
 
 class Document
