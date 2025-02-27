@@ -765,10 +765,10 @@ class Group : public Shape
     // Copy constructor that performs a deep copy
     Group(const Group &other) : id(other.id)
     {
-        for (const auto &child : other.shapes)
-        {
-            shapes.push_back(child->clone());
-        }
+        shapes.reserve(other.shapes.size());
+        std::transform(other.shapes.begin(), other.shapes.end(),
+                       std::back_inserter(shapes),
+                       [](const auto &child) { return child->clone(); });
     }
 
     std::string toString(Layout const &layout) const override
